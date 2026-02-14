@@ -17,6 +17,7 @@
         <module>stat-server-api-dto</module>
         <module>stat-server-domain-model</module>
         <module>stat-client</module>
+        <module>ewm-service</module>
     </modules>
 
     <groupId>ru.practicum</groupId>
