@@ -24,7 +24,7 @@ public class NewHitTest {
         String validUri = "/api/test";
         String validIp = "192.168.1.1";
 
-        NewHit newHit = new NewHit( "server", validUri, validIp, now);
+        NewHit newHit = new NewHit("server", validUri, validIp, now);
 
         assertNotNull(newHit);
         assertEquals(validUri, newHit.getUri());
@@ -37,7 +37,7 @@ public class NewHitTest {
     void shouldThrowExceptionWhenNullUri() {
         ValidationException exception = assertThrowsExactly(
                 ValidationException.class,
-                () -> new NewHit( "server",null, "192.168.1.1", now)
+                () -> new NewHit("server",null, "192.168.1.1", now)
         );
         assertEquals("У запроса должен быть корректным URI", exception.getMessage());
     }
@@ -47,7 +47,7 @@ public class NewHitTest {
     void shouldThrowExceptionWhenEmptyUri() {
         ValidationException exception = assertThrowsExactly(
                 ValidationException.class,
-                () -> new NewHit( "server","", "192.168.1.1", now)
+                () -> new NewHit("server","", "192.168.1.1", now)
         );
         assertEquals("У запроса должен быть корректным URI", exception.getMessage());
     }
@@ -57,13 +57,13 @@ public class NewHitTest {
     void shouldThrowExceptionWhenBlankUri() {
         ValidationException exception1 = assertThrowsExactly(
                 ValidationException.class,
-                () -> new NewHit( "server","   ", "192.168.1.1", now)
+                () -> new NewHit("server","   ", "192.168.1.1", now)
         );
         assertEquals("У запроса должен быть корректным URI", exception1.getMessage());
 
         ValidationException exception2 = assertThrowsExactly(
                 ValidationException.class,
-                () -> new NewHit( "server"," ", "192.168.1.1", now)
+                () -> new NewHit("server"," ", "192.168.1.1", now)
         );
         assertEquals("У запроса должен быть корректным URI", exception2.getMessage());
     }
@@ -73,7 +73,7 @@ public class NewHitTest {
     void shouldThrowExceptionWhenNullIp() {
         ValidationException exception = assertThrowsExactly(
                 ValidationException.class,
-                () -> new NewHit( "server","/api/test", null, now)
+                () -> new NewHit("server","/api/test", null, now)
         );
         assertEquals("У запроса должен корректным быть IP", exception.getMessage());
     }
@@ -83,7 +83,7 @@ public class NewHitTest {
     void shouldThrowExceptionWhenEmptyIp() {
         ValidationException exception = assertThrowsExactly(
                 ValidationException.class,
-                () -> new NewHit( "server","/api/test", "", now)
+                () -> new NewHit("server","/api/test", "", now)
         );
         assertEquals("У запроса должен корректным быть IP", exception.getMessage());
     }
@@ -93,13 +93,13 @@ public class NewHitTest {
     void shouldThrowExceptionWhenBlankIp() {
         ValidationException exception1 = assertThrowsExactly(
                 ValidationException.class,
-                () -> new NewHit( "server","/api/test", "   ", now)
+                () -> new NewHit("server","/api/test", "   ", now)
         );
         assertEquals("У запроса должен корректным быть IP", exception1.getMessage());
 
         ValidationException exception2 = assertThrowsExactly(
                 ValidationException.class,
-                () -> new NewHit( "server","/api/test", " ", now)
+                () -> new NewHit("server","/api/test", " ", now)
         );
         assertEquals("У запроса должен корректным быть IP", exception2.getMessage());
     }
@@ -109,7 +109,7 @@ public class NewHitTest {
     void shouldThrowExceptionWhenNullTime() {
         ValidationException exception = assertThrowsExactly(
                 ValidationException.class,
-                () -> new NewHit( "server","/api/test", "192.168.1.1", null)
+                () -> new NewHit("server","/api/test", "192.168.1.1", null)
         );
         assertEquals("У запроса должно быть корректное время", exception.getMessage());
     }
@@ -121,7 +121,7 @@ public class NewHitTest {
 
         ValidationException exception = assertThrowsExactly(
                 ValidationException.class,
-                () -> new NewHit( "server","/api/test", "192.168.1.1", recentTime)
+                () -> new NewHit("server","/api/test", "192.168.1.1", recentTime)
         );
         assertEquals("У запроса должно быть корректное время", exception.getMessage());
     }
