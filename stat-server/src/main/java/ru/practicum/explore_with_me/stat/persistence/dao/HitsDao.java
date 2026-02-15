@@ -88,6 +88,7 @@ public class HitsDao implements HitRepo {
         }
 
         queryBuilder.append(" GROUP BY server, uri");
+		queryBuilder.append(" ORDER BY hits DESC");
 
         return namedJdbcTemplate.query(
                 queryBuilder.toString(),
