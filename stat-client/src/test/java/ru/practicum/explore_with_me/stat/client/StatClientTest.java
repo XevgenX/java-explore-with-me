@@ -14,8 +14,6 @@ import org.springframework.web.client.RestTemplate;
 import ru.practicum.explore_with_me.stat.api.dto.EndpointHit;
 import ru.practicum.explore_with_me.stat.api.dto.ViewStats;
 
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
