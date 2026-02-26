@@ -1,14 +1,54 @@
 services:
   stats-server:
+    build:
+      context: ./stat-server/
+      dockerfile: Dockerfile
+    container_name: stat-server
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://stats-db:5432/stat
+      - SPRING_DATASOURCE_USERNAME=stat
+      - SPRING_DATASOURCE_PASSWORD=stat
     ports:
       - "9090:9090"
+    depends_on:
+      - stats-db
 
   stats-db:
     image: postgres:16.1
+    container_name: stats-db
+    ports:
+      - "5435:5432"
+    environment:
+      - POSTGRES_PASSWORD=stat
+      - POSTGRES_USER=stat
+      - POSTGRES_DB=stat
+    healthcheck:
+      test: pg_isready -q -d $$POSTGRES_DB -U $$POSTGRES_USER
+      timeout: 5s
+      interval: 5s
+      retries: 10
 
   ewm-service:
+    build:
+      context: ./ewm-service/
+      dockerfile: Dockerfile
+    container_name: ewm-service
     ports:
       - "8080:8080"
+    depends_on:
+      - ewm-db
 
   ewm-db:
     image: postgres:16.1
+    ports:
+      - "5436:5432"
+    container_name: ewm-db
+    environment:
+      - POSTGRES_PASSWORD=ewm
+      - POSTGRES_USER=ewm
+      - POSTGRES_DB=ewm
+    healthcheck:
+      test: pg_isready -q -d $$POSTGRES_DB -U $$POSTGRES_USER
+      timeout: 5s
+      interval: 5s
+      retries: 10
