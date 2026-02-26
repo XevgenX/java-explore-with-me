@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Configuration;
 @OpenAPIDefinition(info = @Info(title = "EWM service API", version = "v0"),
         servers = { @Server(url = "http://localhost:8080") })
 @Configuration
-public class SwaggerConf {
+public class SwaggerEwmConf {
     @Bean
     public GroupedOpenApi publicApi() {
         return GroupedOpenApi.builder()
