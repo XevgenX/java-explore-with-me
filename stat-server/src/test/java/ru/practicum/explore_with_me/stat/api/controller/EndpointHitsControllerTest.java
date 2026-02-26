@@ -97,28 +97,6 @@ class EndpointHitsControllerTest {
                 .andExpect(status().isBadRequest());
     }
 
-    @Test
-    void save_whenEndpointHitWithNullTimestamp_shouldReturnBadRequest() throws Exception {
-        EndpointHit requestDto = createValidEndpointHit();
-        requestDto.setTimestamp(null);
-
-        mockMvc.perform(post("/hit")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(requestDto)))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    void save_whenEndpointHitWithFutureTimestamp_shouldReturnBadRequest() throws Exception {
-        EndpointHit requestDto = createValidEndpointHit();
-        requestDto.setTimestamp(LocalDateTime.now().plusDays(1));
-
-        mockMvc.perform(post("/hit")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(requestDto)))
-                .andExpect(status().isBadRequest());
-    }
-
     private EndpointHit createValidEndpointHit() {
         EndpointHit dto = new EndpointHit();
         dto.setApp("ewm-main-service");

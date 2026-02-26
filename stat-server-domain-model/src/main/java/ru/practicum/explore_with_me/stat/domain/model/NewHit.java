@@ -23,7 +23,6 @@ public class NewHit implements TextValidatable, NowDateValidatable {
         validate(server, "У запроса должен быть корректным URI");
         validate(uri, "У запроса должен быть корректным URI");
         validate(ip, "У запроса должен корректным быть IP");
-        validate(time, "У запроса должно быть корректное время");
         this.server = server;
         this.uri = uri;
         this.ip = ip;

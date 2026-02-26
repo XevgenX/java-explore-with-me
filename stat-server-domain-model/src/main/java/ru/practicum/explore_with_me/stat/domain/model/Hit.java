@@ -26,7 +26,6 @@ public class Hit implements IdValidatable, TextValidatable, ObjectValidatable {
         validate(server, "У запроса должен быть корректным URI");
         validate(uri, "У запроса должен быть корректным URI");
         validate(ip, "У запроса должен корректным быть IP");
-        validate(time, "У запроса должно быть корректное время");
         this.id = id;
         this.server = server;
         this.uri = uri;
