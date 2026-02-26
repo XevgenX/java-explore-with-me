@@ -25,7 +25,7 @@ public class CompilationDao implements CompilationRepo {
 
     @Transactional(readOnly = true)
     @Override
-    public List<Compilation> findAll(@Nullable Boolean pinned, @Nullable Integer from, @Nullable Integer size) {
+    public List<Compilation> findAll(@Nullable Boolean pinned, Integer from, Integer size) {
         Pageable page = PageRequest.of(from / size, size);
         return mapper.toDomainList(repository.findAll(pinned, page));
     }

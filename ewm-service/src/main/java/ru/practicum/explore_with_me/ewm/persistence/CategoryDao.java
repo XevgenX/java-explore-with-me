@@ -3,7 +3,6 @@ package ru.practicum.explore_with_me.ewm.persistence;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.explore_with_me.common.domain.exception.NotFoundException;
@@ -23,7 +22,7 @@ public class CategoryDao implements CategoryRepo {
 
     @Transactional(readOnly = true)
     @Override
-    public List<Category> findAll(@Nullable Integer from, @Nullable Integer size) {
+    public List<Category> findAll(Integer from, Integer size) {
         Pageable page = PageRequest.of(from / size, size);
         return mapper.toDomain(repository.findAll(page));
     }

@@ -33,15 +33,15 @@ public class EventDao implements EventRepo {
                                     @Nullable List<Long> categories,
                                     @Nullable LocalDateTime rangeStart,
                                     @Nullable LocalDateTime rangeEnd,
-                                    @Nullable Integer from,
-                                    @Nullable Integer size) {
+                                    Integer from,
+                                    Integer size) {
         Pageable page = PageRequest.of(from / size, size);
         return mapper.toDomain(repository.findByFilter(users, states, categories, rangeStart, rangeEnd, page));
     }
 
     @Transactional(readOnly = true)
     @Override
-    public List<Event> findByUser(User initiator, @Nullable Integer from, @Nullable Integer size) {
+    public List<Event> findByUser(User initiator, Integer from, Integer size) {
         Pageable page = null;
         if (Objects.nonNull(from) && Objects.nonNull(size)) {
             page = PageRequest.of(from / size, size);
@@ -73,7 +73,7 @@ public class EventDao implements EventRepo {
 
     @Transactional(readOnly = true)
     @Override
-    public List<Event> findByFilter(@Nullable String text, @Nullable Boolean paid, @Nullable List<Long> categories, @Nullable LocalDateTime rangeStart, @Nullable LocalDateTime rangeEnd, @Nullable Boolean onlyAvailable, @Nullable Integer from, @Nullable Integer size, boolean sortByDate) {
+    public List<Event> findByFilter(@Nullable String text, @Nullable Boolean paid, @Nullable List<Long> categories, @Nullable LocalDateTime rangeStart, @Nullable LocalDateTime rangeEnd, @Nullable Boolean onlyAvailable, Integer from, Integer size, boolean sortByDate) {
         Sort sort = sortByDate ?
                 Sort.by(Sort.Direction.ASC, "eventDate") :
                 Sort.by(Sort.Direction.DESC, "views");
