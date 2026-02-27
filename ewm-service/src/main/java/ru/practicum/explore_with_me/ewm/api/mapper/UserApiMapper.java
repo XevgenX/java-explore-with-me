@@ -17,9 +17,9 @@ public class UserApiMapper {
         }
 
         return User.builder()
-                .id(userDto.id())
-                .name(userDto.name())
-                .email(userDto.email())
+                .id(userDto.getId())
+                .name(userDto.getName())
+                .email(userDto.getEmail())
                 .build();
     }
 
@@ -29,8 +29,8 @@ public class UserApiMapper {
         }
 
         return NewUser.builder()
-                .name(userDto.name())
-                .email(userDto.email())
+                .name(userDto.getName())
+                .email(userDto.getEmail())
                 .build();
     }
 
