@@ -13,14 +13,12 @@ import java.util.Optional;
 @Repository
 public interface CompilationRepository extends CrudRepository<CompilationEntity, Long> {
 
-    // Исправлено: c.events (было e.events) и c.pinned (было c.pined)
     @Query("SELECT DISTINCT c FROM CompilationEntity c " +
             "LEFT JOIN FETCH c.events " +
             "WHERE (:pinned IS NULL OR c.pined = :pinned)")
     List<CompilationEntity> findAll(@Param("pinned") Boolean pinned,
                                     Pageable page);
 
-    // Этот запрос правильный
     @Query("SELECT c FROM CompilationEntity c " +
             "LEFT JOIN FETCH c.events " +
             "WHERE c.id = :id")
