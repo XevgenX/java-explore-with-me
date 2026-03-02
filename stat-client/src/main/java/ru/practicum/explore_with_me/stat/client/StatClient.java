@@ -16,8 +16,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 import ru.practicum.explore_with_me.stat.api.dto.EndpointHit;
 import ru.practicum.explore_with_me.stat.api.dto.ViewStats;
 
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -62,12 +60,9 @@ public class StatClient {
 
     public List<ViewStats> getStats(LocalDateTime start, LocalDateTime end,
                                     List<String> uris, Boolean unique) {
-        String encodedStart = URLEncoder.encode(start.format(DATE_FORMATTER), StandardCharsets.UTF_8);
-        String encodedEnd = URLEncoder.encode(end.format(DATE_FORMATTER), StandardCharsets.UTF_8);
-
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(serverUrl + STATS_ENDPOINT)
-                .queryParam("start", encodedStart)
-                .queryParam("end", encodedEnd);
+                .queryParam("start", start.format(DATE_FORMATTER))  // без URLEncoder.encode
+                .queryParam("end", end.format(DATE_FORMATTER));
 
         if (uris != null && !uris.isEmpty()) {
             uris.forEach(uri -> builder.queryParam("uris", uri));

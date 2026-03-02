@@ -1,4 +1,4 @@
-package ru.practicum.explore_with_me.ewm.api;
+package ru.practicum.explore_with_me.ewm.api.conf;
 
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.info.Info;

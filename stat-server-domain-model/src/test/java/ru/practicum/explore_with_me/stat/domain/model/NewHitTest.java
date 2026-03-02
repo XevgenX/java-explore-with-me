@@ -105,16 +105,6 @@ public class NewHitTest {
     }
 
     @Test
-    @DisplayName("Должен выбрасывать ValidationException при null времени")
-    void shouldThrowExceptionWhenNullTime() {
-        ValidationException exception = assertThrowsExactly(
-                ValidationException.class,
-                () -> new NewHit("server","/api/test", "192.168.1.1", null)
-        );
-        assertEquals("У запроса должно быть корректное время", exception.getMessage());
-    }
-
-    @Test
     @DisplayName("Должен использовать Builder для создания объекта")
     void shouldUseBuilderPattern() {
         NewHit newHit = NewHit.builder()

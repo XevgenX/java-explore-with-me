@@ -33,6 +33,11 @@ services:
       context: ./ewm-service/
       dockerfile: Dockerfile
     container_name: ewm-service
+    environment:
+      - STAT_SERVER_URL=http://stats-server:9090
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://ewm-db:5432/ewm
+      - SPRING_DATASOURCE_USERNAME=ewm
+      - SPRING_DATASOURCE_PASSWORD=ewm
     ports:
       - "8080:8080"
     depends_on:

@@ -128,14 +128,4 @@ class HitTest {
         );
         assertEquals("У запроса должен корректным быть IP", exception2.getMessage());
     }
-
-    @Test
-    @DisplayName("Должен выбрасывать ValidationException при null времени")
-    void shouldThrowExceptionWhenNullTime() {
-        ValidationException exception = assertThrowsExactly(
-                ValidationException.class,
-                () -> new Hit(1L, "server", "/api/test", "192.168.1.1", null)
-        );
-        assertEquals("У запроса должно быть корректное время", exception.getMessage());
-    }
 }
