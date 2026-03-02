@@ -8,312 +8,1281 @@
   },
   "item": [
     {
-      "name": "Ok",
-      "item": [
+      "name": "Public: Получение комментариев для события",
+      "event": [
         {
-          "name": "Public: Получение комментариев для события",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test(\"Проверка кода ответа\", function() {\r",
-                  "    pm.response.to.have.status(200);\r",
-                  "});"
-                ],
-                "type": "text/javascript",
-                "packages": {},
-                "requests": {}
-              }
-            }
-          ],
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/events/{{eventId}}/comments",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "events",
-                "{{eventId}}",
-                "comments"
-              ]
-            },
-            "description": "Получение всех комментариев для конкретного события"
-          },
-          "response": []
-        },
-        {
-          "name": "Private: Получение списка своих комментариев",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/users/{{authorId}}/comments",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "users",
-                "{{authorId}}",
-                "comments"
-              ]
-            },
-            "description": "Получение списка комментариев текущего пользователя"
-          },
-          "response": []
-        },
-        {
-          "name": "Private: Добавление комментария",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test(\"Проверка кода ответа\", function() {\r",
-                  "    pm.response.to.have.status(201);\r",
-                  "});"
-                ],
-                "type": "text/javascript",
-                "packages": {},
-                "requests": {}
-              }
-            }
-          ],
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Проверка кода ответа\", function() {\r",
+              "    pm.response.to.have.status(200);\r",
+              "});"
             ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"eventId\": {{eventId}},\n  \"text\": \"{{commentText}}\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "{{baseUrl}}/users/{{authorId}}/comments",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "users",
-                "{{authorId}}",
-                "comments"
-              ]
-            },
-            "description": "Добавление нового комментария от текущего пользователя"
-          },
-          "response": []
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
         },
         {
-          "name": "Private: Обновление комментария",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test(\"Проверка кода ответа\", function() {\r",
-                  "    pm.response.to.have.status(200);\r",
-                  "});"
-                ],
-                "type": "text/javascript",
-                "packages": {},
-                "requests": {}
-              }
-            }
-          ],
-          "request": {
-            "method": "PATCH",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              "function generateUniqueName(base) {\r",
+              "    const timestamp = Date.now();\r",
+              "    const random = Math.floor(Math.random() * 10000);\r",
+              "    return `${base}_${timestamp}_uuid()_${random}`;\r",
+              "}\r",
+              "\r",
+              "function formatDate(date) {\r",
+              "    return date.toISOString().slice(0, 19).replace('T', ' ');\r",
+              "}\r",
+              "const createCategoryRequest = {\r",
+              "    url: 'http://localhost:8080/admin/categories',\r",
+              "    method: 'POST',\r",
+              "    header: {\r",
+              "        'Content-Type': 'application/json'\r",
+              "    },\r",
+              "    body: {\r",
+              "        mode: 'raw',\r",
+              "        raw: JSON.stringify({\r",
+              "            \"name\": generateUniqueName(\"TestCategory\")\r",
+              "        })\r",
+              "    }\r",
+              "};\r",
+              "\r",
+              "function generateEmail() {\r",
+              "    const timestamp = Date.now();\r",
+              "    return `user_${timestamp}@example.com`;\r",
+              "}\r",
+              "\r",
+              "pm.sendRequest(createCategoryRequest, function(err, categoryResponse) {\r",
+              "    if (err) {\r",
+              "        console.error('Ошибка при создании категории:', err);\r",
+              "        return;\r",
+              "    }\r",
+              "\r",
+              "    // Сохраняем ID созданной категории\r",
+              "    const categoryId = categoryResponse.json().id;\r",
+              "    console.log('Категория создана с ID:', categoryId);\r",
+              "\r",
+              "    const createUserRequest = {\r",
+              "        url: 'http://localhost:8080/admin/users',\r",
+              "        method: 'POST',\r",
+              "        header: {\r",
+              "            'Content-Type': 'application/json'\r",
+              "        },\r",
+              "        body: {\r",
+              "            mode: 'raw',\r",
+              "            raw: JSON.stringify({\r",
+              "                \"name\": \"TestUser\",\r",
+              "                \"email\": generateEmail()\r",
+              "            })\r",
+              "        }\r",
+              "    };\r",
+              "    pm.sendRequest(createUserRequest, function(err, userResponse) {\r",
+              "        if (err) {\r",
+              "            console.error('Ошибка при создании пользователя:', err);\r",
+              "            return;\r",
+              "        }\r",
+              "\r",
+              "        // Сохраняем ID созданного пользователя\r",
+              "        const initiatorId = userResponse.json().id;\r",
+              "        pm.collectionVariables.set(\"initiatorId\", initiatorId);\r",
+              "        console.log('initiatorId создан с ID:', initiatorId);\r",
+              "\r",
+              "        const eventDatePrep = new Date();\r",
+              "        eventDatePrep.setHours(eventDatePrep.getHours() + 6);\r",
+              "        const eventDate = formatDate(eventDatePrep);\r",
+              "\r",
+              "        // Формируем тело запроса для события\r",
+              "        const eventBody = {\r",
+              "            \"annotation\": generateUniqueName(\"Это тестовая аннотация для события. Здесь должно быть минимум 20 символов, поэтому я пишу этот длинный текст\"),\r",
+              "            \"category\": categoryId,\r",
+              "            \"description\": generateUniqueName(\"Это подробное описание тестового события. Здесь тоже нужно минимум 20 символов, поэтому продолжаем писать длинный текст для описания события\"),\r",
+              "            \"eventDate\": eventDate,\r",
+              "            \"location\": {\r",
+              "                \"lat\": 55.754, // Широта (например, центр Москвы)\r",
+              "                \"lon\": 37.62 // Долгота\r",
+              "            },\r",
+              "            \"paid\": true,\r",
+              "            \"participantLimit\": 10,\r",
+              "            \"requestModeration\": true,\r",
+              "            \"title\": generateUniqueName(\"Тестовое событие\")\r",
+              "        };\r",
+              "\r",
+              "        pm.request.url.path = pm.request.url.path.map(segment =>\r",
+              "            segment === '{initiatorId}' ? userId.toString() : segment\r",
+              "        );\r",
+              "\r",
+              "        const createEventRequest = {\r",
+              "            url: `http://localhost:8080/users/${initiatorId}/events`,\r",
+              "            method: 'POST',\r",
+              "            header: {\r",
+              "                'Content-Type': 'application/json'\r",
+              "            },\r",
+              "            body: {\r",
+              "                mode: 'raw',\r",
+              "                raw: JSON.stringify(eventBody)\r",
+              "            }\r",
+              "        };\r",
+              "        pm.sendRequest(createEventRequest, function(err, eventResponse) {\r",
+              "            if (err) {\r",
+              "                console.error('❌ Ошибка при создании события:', err);\r",
+              "                return;\r",
+              "            }\r",
+              "\r",
+              "            // Сохраняем ID созданного события\r",
+              "            const createdEventId = eventResponse.json().id;\r",
+              "            console.log(eventResponse.json());\r",
+              "            pm.collectionVariables.set('createdEventId', createdEventId);\r",
+              "        });\r",
+              "\r",
+              "        const createAuthorRequest = {\r",
+              "            url: 'http://localhost:8080/admin/users',\r",
+              "            method: 'POST',\r",
+              "            header: {\r",
+              "                'Content-Type': 'application/json'\r",
+              "            },\r",
+              "            body: {\r",
+              "                mode: 'raw',\r",
+              "                raw: JSON.stringify({\r",
+              "                    \"name\": \"TestUser\",\r",
+              "                    \"email\": generateEmail()\r",
+              "                })\r",
+              "            }\r",
+              "        };\r",
+              "        pm.sendRequest(createAuthorRequest, function(err, userResponse) {\r",
+              "            if (err) {\r",
+              "                console.error('Ошибка при создании автора:', err);\r",
+              "                return;\r",
+              "            }\r",
+              "\r",
+              "            // Сохраняем ID созданного пользователя\r",
+              "            const authorId = userResponse.json().id;\r",
+              "\t\t\tconst commentText = \"Лучшее событие!\";\r",
+              "            pm.collectionVariables.set(\"authorId\", authorId);\r",
+              "            pm.collectionVariables.set('commentText', commentText);\r",
+              "\t\t\t\r",
+              "\t\t\tconst createCommntRequest = {\r",
+              "\t\t\t\turl: `http://localhost:8080/users/${authorId}/comments`,\r",
+              "\t\t\t\tmethod: 'POST',\r",
+              "\t\t\t\theader: {\r",
+              "\t\t\t\t\t'Content-Type': 'application/json'\r",
+              "\t\t\t\t},\r",
+              "\t\t\t\tbody: {\r",
+              "\t\t\t\t\tmode: 'raw',\r",
+              "\t\t\t\t\traw: JSON.stringify({\r",
+              "\t\t\t\t\t\t\"eventId\": pm.collectionVariables.get('createdEventId'),\r",
+              "\t\t\t\t\t\t\"text\": pm.collectionVariables.get('commentText')\r",
+              "\t\t\t\t\t})\r",
+              "\t\t\t\t}\r",
+              "\t\t\t};\r",
+              "\t\t\t\r",
+              "\t\t\tpm.sendRequest(createCommntRequest, function(err, userResponse) {\r",
+              "\t\t\t\tif (err) {\r",
+              "\t\t\t\t\tconsole.error('Ошибка при создании комментария:', err);\r",
+              "\t\t\t\t\treturn;\r",
+              "\t\t\t\t}\r",
+              "\t\t\t\t\r",
+              "\t\t\t\tconst commentId = userResponse.json().id;\r",
+              "\t\t\t\tconsole.log('comment resp')\r",
+              "                console.log(userResponse.json())\r",
+              "\t\t\t});\r",
+              "        });\r",
+              "    });\r",
+              "});"
             ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"text\": \"{{updatedCommentText}}\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "{{baseUrl}}/users/{{authorId}}/comments/{{commentId}}",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "users",
-                "{{authorId}}",
-                "comments",
-                "{{commentId}}"
-              ]
-            },
-            "description": "Обновление существующего комментария"
-          },
-          "response": []
-        },
-        {
-          "name": "Private: Удаление комментария",
-          "request": {
-            "method": "DELETE",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/users/{{authorId}}/comments/{{commentId}}",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "users",
-                "{{authorId}}",
-                "comments",
-                "{{commentId}}"
-              ]
-            },
-            "description": "Удаление комментария текущего пользователя"
-          },
-          "response": []
-        },
-        {
-          "name": "Private: Получение комментариев для модерации",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/users/{{initiatorId}}/events/{{eventId}}/comments",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "users",
-                "{{initiatorId}}",
-                "events",
-                "{{eventId}}",
-                "comments"
-              ]
-            },
-            "description": "Получение комментариев на событие для модерации (для владельца события)"
-          },
-          "response": []
-        },
-        {
-          "name": "Private: Модерация комментариев",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test(\"Проверка кода ответа\", function() {\r",
-                  "    pm.response.to.have.status(200);\r",
-                  "});"
-                ],
-                "type": "text/javascript",
-                "packages": {},
-                "requests": {}
-              }
-            }
-          ],
-          "request": {
-            "method": "PATCH",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"requestIds\": [{{commentId}}],\n  \"status\": \"{{moderationStatus}}\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "{{baseUrl}}/users/{{initiatorId}}/events/{{eventId}}/comments",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "users",
-                "{{initiatorId}}",
-                "events",
-                "{{eventId}}",
-                "comments"
-              ]
-            },
-            "description": "Модерация комментариев на событие (подтверждение или отклонение)"
-          },
-          "response": []
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
         }
-      ]
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/events/{{createdEventId}}/comments",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "events",
+            "{{createdEventId}}",
+            "comments"
+          ]
+        },
+        "description": "Получение всех комментариев для конкретного события"
+      },
+      "response": []
     },
     {
-      "name": "ERROR",
-      "item": [
+      "name": "Private: Получение списка своих комментариев",
+      "event": [
         {
-          "name": "Private: Обновление чужого комментария",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test(\"Проверка кода ответа\", function() {\r",
-                  "    pm.response.to.have.status(200);\r",
-                  "});"
-                ],
-                "type": "text/javascript",
-                "packages": {},
-                "requests": {}
-              }
-            }
-          ],
-          "request": {
-            "method": "PATCH",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              "function generateUniqueName(base) {\r",
+              "    const timestamp = Date.now();\r",
+              "    const random = Math.floor(Math.random() * 10000);\r",
+              "    return `${base}_${timestamp}_uuid()_${random}`;\r",
+              "}\r",
+              "\r",
+              "function formatDate(date) {\r",
+              "    return date.toISOString().slice(0, 19).replace('T', ' ');\r",
+              "}\r",
+              "const createCategoryRequest = {\r",
+              "    url: 'http://localhost:8080/admin/categories',\r",
+              "    method: 'POST',\r",
+              "    header: {\r",
+              "        'Content-Type': 'application/json'\r",
+              "    },\r",
+              "    body: {\r",
+              "        mode: 'raw',\r",
+              "        raw: JSON.stringify({\r",
+              "            \"name\": generateUniqueName(\"TestCategory\")\r",
+              "        })\r",
+              "    }\r",
+              "};\r",
+              "\r",
+              "function generateEmail() {\r",
+              "    const timestamp = Date.now();\r",
+              "    return `user_${timestamp}@example.com`;\r",
+              "}\r",
+              "\r",
+              "pm.sendRequest(createCategoryRequest, function(err, categoryResponse) {\r",
+              "    if (err) {\r",
+              "        console.error('Ошибка при создании категории:', err);\r",
+              "        return;\r",
+              "    }\r",
+              "\r",
+              "    // Сохраняем ID созданной категории\r",
+              "    const categoryId = categoryResponse.json().id;\r",
+              "    console.log('Категория создана с ID:', categoryId);\r",
+              "\r",
+              "    const createUserRequest = {\r",
+              "        url: 'http://localhost:8080/admin/users',\r",
+              "        method: 'POST',\r",
+              "        header: {\r",
+              "            'Content-Type': 'application/json'\r",
+              "        },\r",
+              "        body: {\r",
+              "            mode: 'raw',\r",
+              "            raw: JSON.stringify({\r",
+              "                \"name\": \"TestUser\",\r",
+              "                \"email\": generateEmail()\r",
+              "            })\r",
+              "        }\r",
+              "    };\r",
+              "    pm.sendRequest(createUserRequest, function(err, userResponse) {\r",
+              "        if (err) {\r",
+              "            console.error('Ошибка при создании пользователя:', err);\r",
+              "            return;\r",
+              "        }\r",
+              "\r",
+              "        // Сохраняем ID созданного пользователя\r",
+              "        const initiatorId = userResponse.json().id;\r",
+              "        pm.collectionVariables.set(\"initiatorId\", initiatorId);\r",
+              "        console.log('initiatorId создан с ID:', initiatorId);\r",
+              "\r",
+              "        const eventDatePrep = new Date();\r",
+              "        eventDatePrep.setHours(eventDatePrep.getHours() + 6);\r",
+              "        const eventDate = formatDate(eventDatePrep);\r",
+              "\r",
+              "        // Формируем тело запроса для события\r",
+              "        const eventBody = {\r",
+              "            \"annotation\": generateUniqueName(\"Это тестовая аннотация для события. Здесь должно быть минимум 20 символов, поэтому я пишу этот длинный текст\"),\r",
+              "            \"category\": categoryId,\r",
+              "            \"description\": generateUniqueName(\"Это подробное описание тестового события. Здесь тоже нужно минимум 20 символов, поэтому продолжаем писать длинный текст для описания события\"),\r",
+              "            \"eventDate\": eventDate,\r",
+              "            \"location\": {\r",
+              "                \"lat\": 55.754, // Широта (например, центр Москвы)\r",
+              "                \"lon\": 37.62 // Долгота\r",
+              "            },\r",
+              "            \"paid\": true,\r",
+              "            \"participantLimit\": 10,\r",
+              "            \"requestModeration\": true,\r",
+              "            \"title\": generateUniqueName(\"Тестовое событие\")\r",
+              "        };\r",
+              "\r",
+              "        pm.request.url.path = pm.request.url.path.map(segment =>\r",
+              "            segment === '{initiatorId}' ? userId.toString() : segment\r",
+              "        );\r",
+              "\r",
+              "        const createEventRequest = {\r",
+              "            url: `http://localhost:8080/users/${initiatorId}/events`,\r",
+              "            method: 'POST',\r",
+              "            header: {\r",
+              "                'Content-Type': 'application/json'\r",
+              "            },\r",
+              "            body: {\r",
+              "                mode: 'raw',\r",
+              "                raw: JSON.stringify(eventBody)\r",
+              "            }\r",
+              "        };\r",
+              "        pm.sendRequest(createEventRequest, function(err, eventResponse) {\r",
+              "            if (err) {\r",
+              "                console.error('❌ Ошибка при создании события:', err);\r",
+              "                return;\r",
+              "            }\r",
+              "\r",
+              "            // Сохраняем ID созданного события\r",
+              "            const createdEventId = eventResponse.json().id;\r",
+              "            console.log(eventResponse.json());\r",
+              "            pm.collectionVariables.set('createdEventId', createdEventId);\r",
+              "        });\r",
+              "\r",
+              "        const createAuthorRequest = {\r",
+              "            url: 'http://localhost:8080/admin/users',\r",
+              "            method: 'POST',\r",
+              "            header: {\r",
+              "                'Content-Type': 'application/json'\r",
+              "            },\r",
+              "            body: {\r",
+              "                mode: 'raw',\r",
+              "                raw: JSON.stringify({\r",
+              "                    \"name\": \"TestUser\",\r",
+              "                    \"email\": generateEmail()\r",
+              "                })\r",
+              "            }\r",
+              "        };\r",
+              "        pm.sendRequest(createAuthorRequest, function(err, userResponse) {\r",
+              "            if (err) {\r",
+              "                console.error('Ошибка при создании автора:', err);\r",
+              "                return;\r",
+              "            }\r",
+              "\r",
+              "            // Сохраняем ID созданного пользователя\r",
+              "            const authorId = userResponse.json().id;\r",
+              "\t\t\tconst commentText = \"Лучшее событие!\";\r",
+              "            pm.collectionVariables.set(\"authorId\", authorId);\r",
+              "            pm.collectionVariables.set('commentText', commentText);\r",
+              "\t\t\t\r",
+              "\t\t\tconst createCommntRequest = {\r",
+              "\t\t\t\turl: `http://localhost:8080/users/${authorId}/comments`,\r",
+              "\t\t\t\tmethod: 'POST',\r",
+              "\t\t\t\theader: {\r",
+              "\t\t\t\t\t'Content-Type': 'application/json'\r",
+              "\t\t\t\t},\r",
+              "\t\t\t\tbody: {\r",
+              "\t\t\t\t\tmode: 'raw',\r",
+              "\t\t\t\t\traw: JSON.stringify({\r",
+              "\t\t\t\t\t\t\"eventId\": pm.collectionVariables.get('createdEventId'),\r",
+              "\t\t\t\t\t\t\"text\": pm.collectionVariables.get('commentText')\r",
+              "\t\t\t\t\t})\r",
+              "\t\t\t\t}\r",
+              "\t\t\t};\r",
+              "\t\t\t\r",
+              "\t\t\tpm.sendRequest(createCommntRequest, function(err, userResponse) {\r",
+              "\t\t\t\tif (err) {\r",
+              "\t\t\t\t\tconsole.error('Ошибка при создании комментария:', err);\r",
+              "\t\t\t\t\treturn;\r",
+              "\t\t\t\t}\r",
+              "\t\t\t\t\r",
+              "\t\t\t\tconst commentId = userResponse.json().id;\r",
+              "\t\t\t\tconsole.log('comment resp')\r",
+              "                console.log(userResponse.json())\r",
+              "\t\t\t});\r",
+              "        });\r",
+              "    });\r",
+              "});"
             ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"text\": \"{{updatedCommentText}}\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "{{baseUrl}}/users/{{otherAuthorId}}/comments/{{commentId}}",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "users",
-                "{{otherAuthorId}}",
-                "comments",
-                "{{commentId}}"
-              ]
-            },
-            "description": "Обновление существующего комментария"
-          },
-          "response": []
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Проверка кода ответа\", function() {\r",
+              "    pm.response.to.have.status(200);\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
         }
-      ]
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/users/{{authorId}}/comments",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "users",
+            "{{authorId}}",
+            "comments"
+          ]
+        },
+        "description": "Получение списка комментариев текущего пользователя"
+      },
+      "response": []
+    },
+    {
+      "name": "Private: Добавление комментария",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Проверка кода ответа\", function() {\r",
+              "    pm.response.to.have.status(201);\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        },
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              "function generateUniqueName(base) {\r",
+              "    const timestamp = Date.now();\r",
+              "    const random = Math.floor(Math.random() * 10000);\r",
+              "    return `${base}_${timestamp}_uuid()_${random}`;\r",
+              "}\r",
+              "function formatDate(date) {\r",
+              "    return date.toISOString().slice(0, 19).replace('T', ' ');\r",
+              "}\r",
+              "const createCategoryRequest = {\r",
+              "    url: 'http://localhost:8080/admin/categories',\r",
+              "    method: 'POST',\r",
+              "    header: {\r",
+              "        'Content-Type': 'application/json'\r",
+              "    },\r",
+              "    body: {\r",
+              "        mode: 'raw',\r",
+              "        raw: JSON.stringify({\r",
+              "            \"name\": generateUniqueName(\"TestCategory\")\r",
+              "        })\r",
+              "    }\r",
+              "};\r",
+              "\r",
+              "function generateEmail() {\r",
+              "    const timestamp = Date.now();\r",
+              "    return `user_${timestamp}@example.com`;\r",
+              "}\r",
+              "\r",
+              "pm.sendRequest(createCategoryRequest, function (err, categoryResponse) {\r",
+              "    if (err) {\r",
+              "        console.error('Ошибка при создании категории:', err);\r",
+              "        return;\r",
+              "    }\r",
+              "    \r",
+              "    // Сохраняем ID созданной категории\r",
+              "    const categoryId = categoryResponse.json().id;\r",
+              "    console.log('Категория создана с ID:', categoryId);\r",
+              "\r",
+              "    const createUserRequest = {\r",
+              "        url: 'http://localhost:8080/admin/users',\r",
+              "        method: 'POST',\r",
+              "        header: {\r",
+              "            'Content-Type': 'application/json'\r",
+              "        },\r",
+              "        body: {\r",
+              "            mode: 'raw',\r",
+              "            raw: JSON.stringify({\r",
+              "                \"name\": \"TestUser\",\r",
+              "                \"email\": generateEmail()\r",
+              "            })\r",
+              "        }\r",
+              "    };\r",
+              "    pm.sendRequest(createUserRequest, function (err, userResponse) {\r",
+              "        if (err) {\r",
+              "            console.error('Ошибка при создании пользователя:', err);\r",
+              "            return;\r",
+              "        }\r",
+              "        \r",
+              "        // Сохраняем ID созданного пользователя\r",
+              "        const initiatorId = userResponse.json().id;\r",
+              "        pm.collectionVariables.set(\"initiatorId\", initiatorId);\r",
+              "        console.log('initiatorId создан с ID:', initiatorId);\r",
+              "        \r",
+              "        const eventDatePrep = new Date();\r",
+              "        eventDatePrep.setHours(eventDatePrep.getHours() + 6);\r",
+              "        const eventDate = formatDate(eventDatePrep);\r",
+              "        \r",
+              "        // Формируем тело запроса для события\r",
+              "        const eventBody = {\r",
+              "            \"annotation\": generateUniqueName(\"Это тестовая аннотация для события. Здесь должно быть минимум 20 символов, поэтому я пишу этот длинный текст\"),\r",
+              "            \"category\": categoryId,\r",
+              "            \"description\": generateUniqueName(\"Это подробное описание тестового события. Здесь тоже нужно минимум 20 символов, поэтому продолжаем писать длинный текст для описания события\"),\r",
+              "            \"eventDate\": eventDate,\r",
+              "            \"location\": {\r",
+              "                \"lat\": 55.754,  // Широта (например, центр Москвы)\r",
+              "                \"lon\": 37.62     // Долгота\r",
+              "            },\r",
+              "            \"paid\": true,\r",
+              "            \"participantLimit\": 10,\r",
+              "            \"requestModeration\": true,\r",
+              "            \"title\": generateUniqueName(\"Тестовое событие\")\r",
+              "        };\r",
+              "\r",
+              "        pm.request.url.path = pm.request.url.path.map(segment => \r",
+              "            segment === '{initiatorId}' ? userId.toString() : segment\r",
+              "        );\r",
+              "\r",
+              "    const createEventRequest = {\r",
+              "            url: `http://localhost:8080/users/${initiatorId}/events`,\r",
+              "            method: 'POST',\r",
+              "            header: {\r",
+              "                'Content-Type': 'application/json'\r",
+              "            },\r",
+              "            body: {\r",
+              "                mode: 'raw',\r",
+              "                raw: JSON.stringify(eventBody)\r",
+              "            }\r",
+              "        };\r",
+              "                pm.sendRequest(createEventRequest, function (err, eventResponse) {\r",
+              "            if (err) {\r",
+              "                console.error('❌ Ошибка при создании события:', err);\r",
+              "                return;\r",
+              "            }\r",
+              "            \r",
+              "            // Сохраняем ID созданного события\r",
+              "            const eventId = eventResponse.json().id;\r",
+              "            console.log(eventResponse.json());\r",
+              "            pm.collectionVariables.set('createdEventId', eventId);\r",
+              "        });\r",
+              "\r",
+              "            const createAuthorRequest = {\r",
+              "                url: 'http://localhost:8080/admin/users',\r",
+              "                method: 'POST',\r",
+              "                header: {\r",
+              "                    'Content-Type': 'application/json'\r",
+              "                },\r",
+              "                body: {\r",
+              "                    mode: 'raw',\r",
+              "                    raw: JSON.stringify({\r",
+              "                        \"name\": \"TestUser\",\r",
+              "                        \"email\": generateEmail()\r",
+              "                    })\r",
+              "                }\r",
+              "            };\r",
+              "                pm.sendRequest(createAuthorRequest, function (err, userResponse) {\r",
+              "                    if (err) {\r",
+              "                        console.error('Ошибка при создании пользователя:', err);\r",
+              "                        return;\r",
+              "                    }\r",
+              "                    \r",
+              "                    // Сохраняем ID созданного пользователя\r",
+              "                    const authorId = userResponse.json().id;\r",
+              "                    pm.collectionVariables.set(\"authorId\", authorId);\r",
+              "                    pm.collectionVariables.set('commentText', 'Лучшее событие!');\r",
+              "                });\r",
+              "    });\r",
+              "});    \r",
+              "\r",
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"eventId\": {{createdEventId}},\n  \"text\": \"{{commentText}}\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/users/{{authorId}}/comments",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "users",
+            "{{authorId}}",
+            "comments"
+          ]
+        },
+        "description": "Добавление нового комментария от текущего пользователя"
+      },
+      "response": []
+    },
+    {
+      "name": "Private: Обновление комментария",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Проверка кода ответа\", function() {\r",
+              "    pm.response.to.have.status(200);\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        },
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              "function generateUniqueName(base) {\r",
+              "    const timestamp = Date.now();\r",
+              "    const random = Math.floor(Math.random() * 10000);\r",
+              "    return `${base}_${timestamp}_uuid()_${random}`;\r",
+              "}\r",
+              "\r",
+              "function formatDate(date) {\r",
+              "    return date.toISOString().slice(0, 19).replace('T', ' ');\r",
+              "}\r",
+              "const createCategoryRequest = {\r",
+              "    url: 'http://localhost:8080/admin/categories',\r",
+              "    method: 'POST',\r",
+              "    header: {\r",
+              "        'Content-Type': 'application/json'\r",
+              "    },\r",
+              "    body: {\r",
+              "        mode: 'raw',\r",
+              "        raw: JSON.stringify({\r",
+              "            \"name\": generateUniqueName(\"TestCategory\")\r",
+              "        })\r",
+              "    }\r",
+              "};\r",
+              "\r",
+              "function generateEmail() {\r",
+              "    const timestamp = Date.now();\r",
+              "    return `user_${timestamp}@example.com`;\r",
+              "}\r",
+              "\r",
+              "pm.sendRequest(createCategoryRequest, function(err, categoryResponse) {\r",
+              "    if (err) {\r",
+              "        console.error('Ошибка при создании категории:', err);\r",
+              "        return;\r",
+              "    }\r",
+              "\r",
+              "    // Сохраняем ID созданной категории\r",
+              "    const categoryId = categoryResponse.json().id;\r",
+              "    console.log('Категория создана с ID:', categoryId);\r",
+              "\r",
+              "    const createUserRequest = {\r",
+              "        url: 'http://localhost:8080/admin/users',\r",
+              "        method: 'POST',\r",
+              "        header: {\r",
+              "            'Content-Type': 'application/json'\r",
+              "        },\r",
+              "        body: {\r",
+              "            mode: 'raw',\r",
+              "            raw: JSON.stringify({\r",
+              "                \"name\": \"TestUser\",\r",
+              "                \"email\": generateEmail()\r",
+              "            })\r",
+              "        }\r",
+              "    };\r",
+              "    pm.sendRequest(createUserRequest, function(err, userResponse) {\r",
+              "        if (err) {\r",
+              "            console.error('Ошибка при создании пользователя:', err);\r",
+              "            return;\r",
+              "        }\r",
+              "\r",
+              "        // Сохраняем ID созданного пользователя\r",
+              "        const initiatorId = userResponse.json().id;\r",
+              "        pm.collectionVariables.set(\"initiatorId\", initiatorId);\r",
+              "        console.log('initiatorId создан с ID:', initiatorId);\r",
+              "\r",
+              "        const eventDatePrep = new Date();\r",
+              "        eventDatePrep.setHours(eventDatePrep.getHours() + 6);\r",
+              "        const eventDate = formatDate(eventDatePrep);\r",
+              "\r",
+              "        // Формируем тело запроса для события\r",
+              "        const eventBody = {\r",
+              "            \"annotation\": generateUniqueName(\"Это тестовая аннотация для события. Здесь должно быть минимум 20 символов, поэтому я пишу этот длинный текст\"),\r",
+              "            \"category\": categoryId,\r",
+              "            \"description\": generateUniqueName(\"Это подробное описание тестового события. Здесь тоже нужно минимум 20 символов, поэтому продолжаем писать длинный текст для описания события\"),\r",
+              "            \"eventDate\": eventDate,\r",
+              "            \"location\": {\r",
+              "                \"lat\": 55.754, // Широта (например, центр Москвы)\r",
+              "                \"lon\": 37.62 // Долгота\r",
+              "            },\r",
+              "            \"paid\": true,\r",
+              "            \"participantLimit\": 10,\r",
+              "            \"requestModeration\": true,\r",
+              "            \"title\": generateUniqueName(\"Тестовое событие\")\r",
+              "        };\r",
+              "\r",
+              "        pm.request.url.path = pm.request.url.path.map(segment =>\r",
+              "            segment === '{initiatorId}' ? userId.toString() : segment\r",
+              "        );\r",
+              "\r",
+              "        const createEventRequest = {\r",
+              "            url: `http://localhost:8080/users/${initiatorId}/events`,\r",
+              "            method: 'POST',\r",
+              "            header: {\r",
+              "                'Content-Type': 'application/json'\r",
+              "            },\r",
+              "            body: {\r",
+              "                mode: 'raw',\r",
+              "                raw: JSON.stringify(eventBody)\r",
+              "            }\r",
+              "        };\r",
+              "        pm.sendRequest(createEventRequest, function(err, eventResponse) {\r",
+              "            if (err) {\r",
+              "                console.error('❌ Ошибка при создании события:', err);\r",
+              "                return;\r",
+              "            }\r",
+              "\r",
+              "            // Сохраняем ID созданного события\r",
+              "            const createdEventId = eventResponse.json().id;\r",
+              "            console.log(eventResponse.json());\r",
+              "            pm.collectionVariables.set('createdEventId', createdEventId);\r",
+              "        });\r",
+              "\r",
+              "        const createAuthorRequest = {\r",
+              "            url: 'http://localhost:8080/admin/users',\r",
+              "            method: 'POST',\r",
+              "            header: {\r",
+              "                'Content-Type': 'application/json'\r",
+              "            },\r",
+              "            body: {\r",
+              "                mode: 'raw',\r",
+              "                raw: JSON.stringify({\r",
+              "                    \"name\": \"TestUser\",\r",
+              "                    \"email\": generateEmail()\r",
+              "                })\r",
+              "            }\r",
+              "        };\r",
+              "        pm.sendRequest(createAuthorRequest, function(err, userResponse) {\r",
+              "            if (err) {\r",
+              "                console.error('Ошибка при создании автора:', err);\r",
+              "                return;\r",
+              "            }\r",
+              "\r",
+              "            // Сохраняем ID созданного пользователя\r",
+              "            const authorId = userResponse.json().id;\r",
+              "\t\t\tconst commentText = \"Лучшее событие!\";\r",
+              "            pm.collectionVariables.set(\"authorId\", authorId);\r",
+              "            pm.collectionVariables.set('commentText', commentText);\r",
+              "\t\t\t\r",
+              "\t\t\tconst createCommntRequest = {\r",
+              "\t\t\t\turl: `http://localhost:8080/users/${authorId}/comments`,\r",
+              "\t\t\t\tmethod: 'POST',\r",
+              "\t\t\t\theader: {\r",
+              "\t\t\t\t\t'Content-Type': 'application/json'\r",
+              "\t\t\t\t},\r",
+              "\t\t\t\tbody: {\r",
+              "\t\t\t\t\tmode: 'raw',\r",
+              "\t\t\t\t\traw: JSON.stringify({\r",
+              "\t\t\t\t\t\t\"eventId\": pm.collectionVariables.get('createdEventId'),\r",
+              "\t\t\t\t\t\t\"text\": pm.collectionVariables.get('commentText')\r",
+              "\t\t\t\t\t})\r",
+              "\t\t\t\t}\r",
+              "\t\t\t};\r",
+              "\t\t\t\r",
+              "\t\t\tpm.sendRequest(createCommntRequest, function(err, userResponse) {\r",
+              "\t\t\t\tif (err) {\r",
+              "\t\t\t\t\tconsole.error('Ошибка при создании комментария:', err);\r",
+              "\t\t\t\t\treturn;\r",
+              "\t\t\t\t}\r",
+              "\t\t\t\t\r",
+              "\t\t\t\tconst commentId = userResponse.json().id;\r",
+              "\t\t\t\tconsole.log('comment resp')\r",
+              "                console.log(userResponse.json())\r",
+              "\t\t\t\tpm.collectionVariables.set(\"commentId\", commentId);\r",
+              "\t\t\t\tpm.collectionVariables.set('updatedCommentText', 'Более лучшее событие!');\r",
+              "\t\t\t});\r",
+              "        });\r",
+              "    });\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"text\": \"{{updatedCommentText}}\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/users/{{authorId}}/comments/{{commentId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "users",
+            "{{authorId}}",
+            "comments",
+            "{{commentId}}"
+          ]
+        },
+        "description": "Обновление существующего комментария"
+      },
+      "response": []
+    },
+    {
+      "name": "Private: Получение комментариев для модерации",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              "function generateUniqueName(base) {\r",
+              "    const timestamp = Date.now();\r",
+              "    const random = Math.floor(Math.random() * 10000);\r",
+              "    return `${base}_${timestamp}_uuid()_${random}`;\r",
+              "}\r",
+              "\r",
+              "function formatDate(date) {\r",
+              "    return date.toISOString().slice(0, 19).replace('T', ' ');\r",
+              "}\r",
+              "const createCategoryRequest = {\r",
+              "    url: 'http://localhost:8080/admin/categories',\r",
+              "    method: 'POST',\r",
+              "    header: {\r",
+              "        'Content-Type': 'application/json'\r",
+              "    },\r",
+              "    body: {\r",
+              "        mode: 'raw',\r",
+              "        raw: JSON.stringify({\r",
+              "            \"name\": generateUniqueName(\"TestCategory\")\r",
+              "        })\r",
+              "    }\r",
+              "};\r",
+              "\r",
+              "function generateEmail() {\r",
+              "    const timestamp = Date.now();\r",
+              "    return `user_${timestamp}@example.com`;\r",
+              "}\r",
+              "\r",
+              "pm.sendRequest(createCategoryRequest, function(err, categoryResponse) {\r",
+              "    if (err) {\r",
+              "        console.error('Ошибка при создании категории:', err);\r",
+              "        return;\r",
+              "    }\r",
+              "\r",
+              "    // Сохраняем ID созданной категории\r",
+              "    const categoryId = categoryResponse.json().id;\r",
+              "    console.log('Категория создана с ID:', categoryId);\r",
+              "\r",
+              "    const createUserRequest = {\r",
+              "        url: 'http://localhost:8080/admin/users',\r",
+              "        method: 'POST',\r",
+              "        header: {\r",
+              "            'Content-Type': 'application/json'\r",
+              "        },\r",
+              "        body: {\r",
+              "            mode: 'raw',\r",
+              "            raw: JSON.stringify({\r",
+              "                \"name\": \"TestUser\",\r",
+              "                \"email\": generateEmail()\r",
+              "            })\r",
+              "        }\r",
+              "    };\r",
+              "    pm.sendRequest(createUserRequest, function(err, userResponse) {\r",
+              "        if (err) {\r",
+              "            console.error('Ошибка при создании пользователя:', err);\r",
+              "            return;\r",
+              "        }\r",
+              "\r",
+              "        // Сохраняем ID созданного пользователя\r",
+              "        const initiatorId = userResponse.json().id;\r",
+              "        pm.collectionVariables.set(\"initiatorId\", initiatorId);\r",
+              "        console.log('initiatorId создан с ID:', initiatorId);\r",
+              "\r",
+              "        const eventDatePrep = new Date();\r",
+              "        eventDatePrep.setHours(eventDatePrep.getHours() + 6);\r",
+              "        const eventDate = formatDate(eventDatePrep);\r",
+              "\r",
+              "        // Формируем тело запроса для события\r",
+              "        const eventBody = {\r",
+              "            \"annotation\": generateUniqueName(\"Это тестовая аннотация для события. Здесь должно быть минимум 20 символов, поэтому я пишу этот длинный текст\"),\r",
+              "            \"category\": categoryId,\r",
+              "            \"description\": generateUniqueName(\"Это подробное описание тестового события. Здесь тоже нужно минимум 20 символов, поэтому продолжаем писать длинный текст для описания события\"),\r",
+              "            \"eventDate\": eventDate,\r",
+              "            \"location\": {\r",
+              "                \"lat\": 55.754, // Широта (например, центр Москвы)\r",
+              "                \"lon\": 37.62 // Долгота\r",
+              "            },\r",
+              "            \"paid\": true,\r",
+              "            \"participantLimit\": 10,\r",
+              "            \"requestModeration\": true,\r",
+              "            \"title\": generateUniqueName(\"Тестовое событие\")\r",
+              "        };\r",
+              "\r",
+              "        pm.request.url.path = pm.request.url.path.map(segment =>\r",
+              "            segment === '{initiatorId}' ? userId.toString() : segment\r",
+              "        );\r",
+              "\r",
+              "        const createEventRequest = {\r",
+              "            url: `http://localhost:8080/users/${initiatorId}/events`,\r",
+              "            method: 'POST',\r",
+              "            header: {\r",
+              "                'Content-Type': 'application/json'\r",
+              "            },\r",
+              "            body: {\r",
+              "                mode: 'raw',\r",
+              "                raw: JSON.stringify(eventBody)\r",
+              "            }\r",
+              "        };\r",
+              "        pm.sendRequest(createEventRequest, function(err, eventResponse) {\r",
+              "            if (err) {\r",
+              "                console.error('❌ Ошибка при создании события:', err);\r",
+              "                return;\r",
+              "            }\r",
+              "\r",
+              "            // Сохраняем ID созданного события\r",
+              "            const createdEventId = eventResponse.json().id;\r",
+              "            console.log(eventResponse.json());\r",
+              "            pm.collectionVariables.set('createdEventId', createdEventId);\r",
+              "        });\r",
+              "\r",
+              "        const createAuthorRequest = {\r",
+              "            url: 'http://localhost:8080/admin/users',\r",
+              "            method: 'POST',\r",
+              "            header: {\r",
+              "                'Content-Type': 'application/json'\r",
+              "            },\r",
+              "            body: {\r",
+              "                mode: 'raw',\r",
+              "                raw: JSON.stringify({\r",
+              "                    \"name\": \"TestUser\",\r",
+              "                    \"email\": generateEmail()\r",
+              "                })\r",
+              "            }\r",
+              "        };\r",
+              "        pm.sendRequest(createAuthorRequest, function(err, userResponse) {\r",
+              "            if (err) {\r",
+              "                console.error('Ошибка при создании автора:', err);\r",
+              "                return;\r",
+              "            }\r",
+              "\r",
+              "            // Сохраняем ID созданного пользователя\r",
+              "            const authorId = userResponse.json().id;\r",
+              "\t\t\tconst commentText = \"Лучшее событие!\";\r",
+              "            pm.collectionVariables.set(\"authorId\", authorId);\r",
+              "            pm.collectionVariables.set('commentText', commentText);\r",
+              "\t\t\t\r",
+              "\t\t\tconst createCommntRequest = {\r",
+              "\t\t\t\turl: `http://localhost:8080/users/${authorId}/comments`,\r",
+              "\t\t\t\tmethod: 'POST',\r",
+              "\t\t\t\theader: {\r",
+              "\t\t\t\t\t'Content-Type': 'application/json'\r",
+              "\t\t\t\t},\r",
+              "\t\t\t\tbody: {\r",
+              "\t\t\t\t\tmode: 'raw',\r",
+              "\t\t\t\t\traw: JSON.stringify({\r",
+              "\t\t\t\t\t\t\"eventId\": pm.collectionVariables.get('createdEventId'),\r",
+              "\t\t\t\t\t\t\"text\": pm.collectionVariables.get('commentText')\r",
+              "\t\t\t\t\t})\r",
+              "\t\t\t\t}\r",
+              "\t\t\t};\r",
+              "\t\t\t\r",
+              "\t\t\tpm.sendRequest(createCommntRequest, function(err, userResponse) {\r",
+              "\t\t\t\tif (err) {\r",
+              "\t\t\t\t\tconsole.error('Ошибка при создании комментария:', err);\r",
+              "\t\t\t\t\treturn;\r",
+              "\t\t\t\t}\r",
+              "\t\t\t\t\r",
+              "\t\t\t\tconst commentId = userResponse.json().id;\r",
+              "\t\t\t\tconsole.log('comment resp')\r",
+              "                console.log(userResponse.json())\r",
+              "\t\t\t});\r",
+              "        });\r",
+              "    });\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Проверка кода ответа\", function() {\r",
+              "    pm.response.to.have.status(200);\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/users/{{initiatorId}}/events/{{createdEventId}}/comments",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "users",
+            "{{initiatorId}}",
+            "events",
+            "{{createdEventId}}",
+            "comments"
+          ]
+        },
+        "description": "Получение комментариев на событие для модерации (для владельца события)"
+      },
+      "response": []
+    },
+    {
+      "name": "Private: Модерация комментариев",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Проверка кода ответа\", function() {\r",
+              "    pm.response.to.have.status(200);\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        },
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              "function generateUniqueName(base) {\r",
+              "    const timestamp = Date.now();\r",
+              "    const random = Math.floor(Math.random() * 10000);\r",
+              "    return `${base}_${timestamp}_uuid()_${random}`;\r",
+              "}\r",
+              "\r",
+              "function formatDate(date) {\r",
+              "    return date.toISOString().slice(0, 19).replace('T', ' ');\r",
+              "}\r",
+              "const createCategoryRequest = {\r",
+              "    url: 'http://localhost:8080/admin/categories',\r",
+              "    method: 'POST',\r",
+              "    header: {\r",
+              "        'Content-Type': 'application/json'\r",
+              "    },\r",
+              "    body: {\r",
+              "        mode: 'raw',\r",
+              "        raw: JSON.stringify({\r",
+              "            \"name\": generateUniqueName(\"TestCategory\")\r",
+              "        })\r",
+              "    }\r",
+              "};\r",
+              "\r",
+              "function generateEmail() {\r",
+              "    const timestamp = Date.now();\r",
+              "    return `user_${timestamp}@example.com`;\r",
+              "}\r",
+              "\r",
+              "pm.sendRequest(createCategoryRequest, function(err, categoryResponse) {\r",
+              "    if (err) {\r",
+              "        console.error('Ошибка при создании категории:', err);\r",
+              "        return;\r",
+              "    }\r",
+              "\r",
+              "    // Сохраняем ID созданной категории\r",
+              "    const categoryId = categoryResponse.json().id;\r",
+              "    console.log('Категория создана с ID:', categoryId);\r",
+              "\r",
+              "    const createUserRequest = {\r",
+              "        url: 'http://localhost:8080/admin/users',\r",
+              "        method: 'POST',\r",
+              "        header: {\r",
+              "            'Content-Type': 'application/json'\r",
+              "        },\r",
+              "        body: {\r",
+              "            mode: 'raw',\r",
+              "            raw: JSON.stringify({\r",
+              "                \"name\": \"TestUser\",\r",
+              "                \"email\": generateEmail()\r",
+              "            })\r",
+              "        }\r",
+              "    };\r",
+              "    pm.sendRequest(createUserRequest, function(err, userResponse) {\r",
+              "        if (err) {\r",
+              "            console.error('Ошибка при создании пользователя:', err);\r",
+              "            return;\r",
+              "        }\r",
+              "\r",
+              "        // Сохраняем ID созданного пользователя\r",
+              "        const initiatorId = userResponse.json().id;\r",
+              "        pm.collectionVariables.set(\"initiatorId\", initiatorId);\r",
+              "        console.log('initiatorId создан с ID:', initiatorId);\r",
+              "\r",
+              "        const eventDatePrep = new Date();\r",
+              "        eventDatePrep.setHours(eventDatePrep.getHours() + 6);\r",
+              "        const eventDate = formatDate(eventDatePrep);\r",
+              "\r",
+              "        // Формируем тело запроса для события\r",
+              "        const eventBody = {\r",
+              "            \"annotation\": generateUniqueName(\"Это тестовая аннотация для события. Здесь должно быть минимум 20 символов, поэтому я пишу этот длинный текст\"),\r",
+              "            \"category\": categoryId,\r",
+              "            \"description\": generateUniqueName(\"Это подробное описание тестового события. Здесь тоже нужно минимум 20 символов, поэтому продолжаем писать длинный текст для описания события\"),\r",
+              "            \"eventDate\": eventDate,\r",
+              "            \"location\": {\r",
+              "                \"lat\": 55.754, // Широта (например, центр Москвы)\r",
+              "                \"lon\": 37.62 // Долгота\r",
+              "            },\r",
+              "            \"paid\": true,\r",
+              "            \"participantLimit\": 10,\r",
+              "            \"requestModeration\": true,\r",
+              "            \"title\": generateUniqueName(\"Тестовое событие\")\r",
+              "        };\r",
+              "\r",
+              "        pm.request.url.path = pm.request.url.path.map(segment =>\r",
+              "            segment === '{initiatorId}' ? userId.toString() : segment\r",
+              "        );\r",
+              "\r",
+              "        const createEventRequest = {\r",
+              "            url: `http://localhost:8080/users/${initiatorId}/events`,\r",
+              "            method: 'POST',\r",
+              "            header: {\r",
+              "                'Content-Type': 'application/json'\r",
+              "            },\r",
+              "            body: {\r",
+              "                mode: 'raw',\r",
+              "                raw: JSON.stringify(eventBody)\r",
+              "            }\r",
+              "        };\r",
+              "        pm.sendRequest(createEventRequest, function(err, eventResponse) {\r",
+              "            if (err) {\r",
+              "                console.error('❌ Ошибка при создании события:', err);\r",
+              "                return;\r",
+              "            }\r",
+              "\r",
+              "            // Сохраняем ID созданного события\r",
+              "            const createdEventId = eventResponse.json().id;\r",
+              "            console.log(eventResponse.json());\r",
+              "            pm.collectionVariables.set('createdEventId', createdEventId);\r",
+              "        });\r",
+              "\r",
+              "        const createAuthorRequest = {\r",
+              "            url: 'http://localhost:8080/admin/users',\r",
+              "            method: 'POST',\r",
+              "            header: {\r",
+              "                'Content-Type': 'application/json'\r",
+              "            },\r",
+              "            body: {\r",
+              "                mode: 'raw',\r",
+              "                raw: JSON.stringify({\r",
+              "                    \"name\": \"TestUser\",\r",
+              "                    \"email\": generateEmail()\r",
+              "                })\r",
+              "            }\r",
+              "        };\r",
+              "        pm.sendRequest(createAuthorRequest, function(err, userResponse) {\r",
+              "            if (err) {\r",
+              "                console.error('Ошибка при создании автора:', err);\r",
+              "                return;\r",
+              "            }\r",
+              "\r",
+              "            // Сохраняем ID созданного пользователя\r",
+              "            const authorId = userResponse.json().id;\r",
+              "\t\t\tconst commentText = \"Лучшее событие!\";\r",
+              "            pm.collectionVariables.set(\"authorId\", authorId);\r",
+              "            pm.collectionVariables.set('commentText', commentText);\r",
+              "\t\t\t\r",
+              "\t\t\tconst createCommntRequest = {\r",
+              "\t\t\t\turl: `http://localhost:8080/users/${authorId}/comments`,\r",
+              "\t\t\t\tmethod: 'POST',\r",
+              "\t\t\t\theader: {\r",
+              "\t\t\t\t\t'Content-Type': 'application/json'\r",
+              "\t\t\t\t},\r",
+              "\t\t\t\tbody: {\r",
+              "\t\t\t\t\tmode: 'raw',\r",
+              "\t\t\t\t\traw: JSON.stringify({\r",
+              "\t\t\t\t\t\t\"eventId\": pm.collectionVariables.get('createdEventId'),\r",
+              "\t\t\t\t\t\t\"text\": pm.collectionVariables.get('commentText')\r",
+              "\t\t\t\t\t})\r",
+              "\t\t\t\t}\r",
+              "\t\t\t};\r",
+              "\t\t\t\r",
+              "\t\t\tpm.sendRequest(createCommntRequest, function(err, userResponse) {\r",
+              "\t\t\t\tif (err) {\r",
+              "\t\t\t\t\tconsole.error('Ошибка при создании комментария:', err);\r",
+              "\t\t\t\t\treturn;\r",
+              "\t\t\t\t}\r",
+              "\t\t\t\t\r",
+              "\t\t\t\tconst commentId = userResponse.json().id;\r",
+              "\t\t\t\tconsole.log('comment resp')\r",
+              "                console.log(userResponse.json())\r",
+              "\t\t\t});\r",
+              "        });\r",
+              "    });\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"requestIds\": [{{commentId}}],\n  \"status\": \"{{moderationStatus}}\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/users/{{initiatorId}}/events/{{createdEventId}}/comments",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "users",
+            "{{initiatorId}}",
+            "events",
+            "{{createdEventId}}",
+            "comments"
+          ]
+        },
+        "description": "Модерация комментариев на событие (подтверждение или отклонение)"
+      },
+      "response": []
     }
   ],
   "event": [
@@ -347,21 +1316,6 @@
       "description": "Базовый URL сервиса"
     },
     {
-      "key": "authorId",
-      "value": "1",
-      "description": "ID текущего пользователя"
-    },
-    {
-      "key": "eventId",
-      "value": "1",
-      "description": "ID события"
-    },
-    {
-      "key": "commentId",
-      "value": "1",
-      "description": "ID комментария"
-    },
-    {
       "key": "commentText",
       "value": "Вау! Обязательно пойду!",
       "description": "Текст комментария"
@@ -377,11 +1331,19 @@
       "description": "Статус модерации (APPROVED/REJECTED)"
     },
     {
+      "key": "createdEventId",
+      "value": ""
+    },
+    {
       "key": "initiatorId",
       "value": ""
     },
     {
-      "key": "otherAuthorId",
+      "key": "authorId",
+      "value": ""
+    },
+    {
+      "key": "commentId",
       "value": ""
     }
   ]
