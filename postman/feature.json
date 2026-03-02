@@ -1,0 +1,388 @@
+{
+  "info": {
+    "_postman_id": "c09cc937-df32-4578-a02e-fcaafe1f66ab",
+    "name": "Test Explore WithMe - Main service - Comments",
+    "description": "Коллекция для тестирования операций с комментариями",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "22806684"
+  },
+  "item": [
+    {
+      "name": "Ok",
+      "item": [
+        {
+          "name": "Public: Получение комментариев для события",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Проверка кода ответа\", function() {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/events/{{eventId}}/comments",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "events",
+                "{{eventId}}",
+                "comments"
+              ]
+            },
+            "description": "Получение всех комментариев для конкретного события"
+          },
+          "response": []
+        },
+        {
+          "name": "Private: Получение списка своих комментариев",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/users/{{authorId}}/comments",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users",
+                "{{authorId}}",
+                "comments"
+              ]
+            },
+            "description": "Получение списка комментариев текущего пользователя"
+          },
+          "response": []
+        },
+        {
+          "name": "Private: Добавление комментария",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Проверка кода ответа\", function() {\r",
+                  "    pm.response.to.have.status(201);\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"eventId\": {{eventId}},\n  \"text\": \"{{commentText}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/users/{{authorId}}/comments",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users",
+                "{{authorId}}",
+                "comments"
+              ]
+            },
+            "description": "Добавление нового комментария от текущего пользователя"
+          },
+          "response": []
+        },
+        {
+          "name": "Private: Обновление комментария",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Проверка кода ответа\", function() {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"text\": \"{{updatedCommentText}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/users/{{authorId}}/comments/{{commentId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users",
+                "{{authorId}}",
+                "comments",
+                "{{commentId}}"
+              ]
+            },
+            "description": "Обновление существующего комментария"
+          },
+          "response": []
+        },
+        {
+          "name": "Private: Удаление комментария",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/users/{{authorId}}/comments/{{commentId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users",
+                "{{authorId}}",
+                "comments",
+                "{{commentId}}"
+              ]
+            },
+            "description": "Удаление комментария текущего пользователя"
+          },
+          "response": []
+        },
+        {
+          "name": "Private: Получение комментариев для модерации",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/users/{{initiatorId}}/events/{{eventId}}/comments",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users",
+                "{{initiatorId}}",
+                "events",
+                "{{eventId}}",
+                "comments"
+              ]
+            },
+            "description": "Получение комментариев на событие для модерации (для владельца события)"
+          },
+          "response": []
+        },
+        {
+          "name": "Private: Модерация комментариев",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Проверка кода ответа\", function() {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"requestIds\": [{{commentId}}],\n  \"status\": \"{{moderationStatus}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/users/{{initiatorId}}/events/{{eventId}}/comments",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users",
+                "{{initiatorId}}",
+                "events",
+                "{{eventId}}",
+                "comments"
+              ]
+            },
+            "description": "Модерация комментариев на событие (подтверждение или отклонение)"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "ERROR",
+      "item": [
+        {
+          "name": "Private: Обновление чужого комментария",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Проверка кода ответа\", function() {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"text\": \"{{updatedCommentText}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/users/{{otherAuthorId}}/comments/{{commentId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users",
+                "{{otherAuthorId}}",
+                "comments",
+                "{{commentId}}"
+              ]
+            },
+            "description": "Обновление существующего комментария"
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080",
+      "description": "Базовый URL сервиса"
+    },
+    {
+      "key": "authorId",
+      "value": "1",
+      "description": "ID текущего пользователя"
+    },
+    {
+      "key": "eventId",
+      "value": "1",
+      "description": "ID события"
+    },
+    {
+      "key": "commentId",
+      "value": "1",
+      "description": "ID комментария"
+    },
+    {
+      "key": "commentText",
+      "value": "Вау! Обязательно пойду!",
+      "description": "Текст комментария"
+    },
+    {
+      "key": "updatedCommentText",
+      "value": "Обновленный текст комментария",
+      "description": "Обновленный текст комментария"
+    },
+    {
+      "key": "moderationStatus",
+      "value": "APPROVED",
+      "description": "Статус модерации (APPROVED/REJECTED)"
+    },
+    {
+      "key": "initiatorId",
+      "value": ""
+    },
+    {
+      "key": "otherAuthorId",
+      "value": ""
+    }
+  ]
+}
