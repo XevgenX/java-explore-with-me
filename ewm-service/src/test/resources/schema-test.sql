@@ -80,5 +80,19 @@ CREATE TABLE IF NOT EXISTS compilation_events (
     FOREIGN KEY (event_id) REFERENCES events(id) ON DELETE CASCADE
 );
 
+CREATE TABLE IF NOT EXISTS comments (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    event_id BIGINT NOT NULL,
+    author_id BIGINT NOT NULL,
+    text VARCHAR(250) NOT NULL,
+    created TIMESTAMP NOT NULL,
+    updated TIMESTAMP,
+    status VARCHAR(50) NOT NULL,
+    CONSTRAINT fk_comments_event FOREIGN KEY (event_id)
+        REFERENCES events(id) ON DELETE CASCADE,
+    CONSTRAINT fk_comments_requester FOREIGN KEY (author_id)
+        REFERENCES users(id) ON DELETE CASCADE
+);
+
 -- Включаем проверку внешних ключей обратно
 SET REFERENTIAL_INTEGRITY TRUE;
